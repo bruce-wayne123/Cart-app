@@ -1,8 +1,10 @@
 import './App.css';
-
+import CartItem from "./CartItem";
 function App() {
   return (
-    <div><h1>Your cart</h1></div>
+    <div>
+      <CartItem />
+    </div>
   );
 }
 
