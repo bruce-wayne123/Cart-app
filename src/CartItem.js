@@ -1,22 +1,30 @@
 import React from "react";
 
+
 class CartItem extends React.Component {
 
-    constructor() {
-        super();
-        this.state = {
-            price: 999,
-            title: "Phone",
-            qty: 1,
-            img: ''
-        };
-    }
+    increaseQuantity = () => {
+        this.setState((prevState) => {
+            return {
+                qty: prevState.qty + 1
+            }
+        }, () => {
 
-    increaseQuantity() {
-        console.log(this);
+        })
+    };
+
+    decreaseQuantity = () => {
+        if (this.state.qty == 0) {
+            return;
+        }
+        this.setState((prevState) => {
+            return {
+                qty: prevState.qty - 1
+            }
+        })
     }
     render() {
-        const { title, price, qty } = this.state;
+        const { title, price, qty } = this.props.product;
         return (
             <div className="cart-item">
                 <div className="left-block">
@@ -28,7 +36,7 @@ class CartItem extends React.Component {
                     <div style={{ color: "#777" }}>Quantity : {qty}</div>
                     <div className="cart-item-actions">
                         <img alt="increase" className="action-icons" src="https://img.icons8.com/?size=512&id=24717&format=png" onClick={this.increaseQuantity} />
-                        <img alt="decrease" className="action-icons" src="https://img.icons8.com/?size=512&id=1504&format=png" />
+                        <img alt="decrease" className="action-icons" src="https://img.icons8.com/?size=512&id=1504&format=png" onClick={this.decreaseQuantity} />
                         <img alt="delete" className="action-icons" src="https://img.icons8.com/?size=512&id=67884&format=png" />
                     </div>
                 </div>
