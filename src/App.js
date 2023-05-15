@@ -15,29 +15,36 @@ class App extends React.Component {
   onIncrease = (product) => {
     let { products } = this.state;
     const index = products.indexOf(product);
-    products[index].qty += 1;
-    this.setState({
-      products
-    });
+    const docRef = db.collection('products').doc(products[index].id);
+    docRef.update({
+      qty: products[index].qty + 1
+    }).then(() => {
+
+    })
+      .catch((error) => {
+        console.log(error);
+      });
   }
 
   onDecrease = (product) => {
     let { products } = this.state;
     const index = products.indexOf(product);
-    if ((products[index].qty > 0)) {
-      products[index].qty -= 1;
-    }
-    this.setState({
-      products
-    });
-  }
+    const docRef = db.collection('products').doc(products[index].id);
+    docRef.update({
+      qty: products[index].qty - 1
+    })
+  };
 
   onDeleteProduct = (id) => {
     const { products } = this.state;
-    const items = products.filter((item) => item.id !== id);
-    this.setState({
-      products: items
-    });
+    const docRef = db.collection('products').doc(id);
+    docRef.delete()
+      .then(() => {
+
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   getCartsCount = () => {
@@ -60,20 +67,35 @@ class App extends React.Component {
     });
 
     return totalPrice;
-  }
+  };
+
+  addProduct = () => {
+    db.collection("products").add({
+      imgSourceURL: "https://m.media-amazon.com/images/I/714vSwERZUL._SL1500_.jpg",
+      price: 1000,
+      qty: 2,
+      title: "Washing Machine"
+    }).then((docRef) => {
+      console.log("Product has been added..", docRef);
+    }).catch((error) => {
+      console.log(error)
+    });
+  };
 
   async componentDidMount() {
-    db.collection("products").onSnapshot((snapshot) => {
-      const products = snapshot.docs.map((doc) => {
-        const data = doc.data();
-        data['id'] = doc.id;
-        return data;
+    db.collection("products").
+      orderBy('price','desc').
+      onSnapshot((snapshot) => {
+        const products = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          data['id'] = doc.id;
+          return data;
+        });
+        this.setState({
+          products: products,
+          loading: false
+        });
       });
-      this.setState({
-        products: products,
-        loading: false
-      });
-    });
   }
 
   render() {
@@ -82,6 +104,7 @@ class App extends React.Component {
       <div>
         {loading && <h1>Loading Products..</h1>}
         <Navbar count={this.getCartsCount()} />
+        {/* <button onClick={this.addProduct} style={{ padding: 10 }}>Add product</button> */}
         <Cart products={products} onQtyIncreased={this.onIncrease}
           onQtyDecreased={this.onDecrease} onProductDelete={this.onDeleteProduct} />
         <div>Total :  Rs.{this.getCartTotalPrice()}</div>
